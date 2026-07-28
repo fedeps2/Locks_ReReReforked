@@ -1,0 +1,14 @@
+{
+  "required": false,
+  "package": "melonslise.locks.mixin.compact",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "LootrMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8"
+}

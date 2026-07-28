@@ -1,0 +1,13 @@
+build/
+.gradle/
+.idea/
+*.iml
+.DS_Store
+run/
+.eclipse/
+bin/
+out/
+*.class
+*.jar
+!build/libs/*.jar
+local.properties

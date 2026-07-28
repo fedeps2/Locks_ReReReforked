@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "locks:key_ring" },
+    { "item": "minecraft:leather" },
+    { "item": "minecraft:iron_ingot" }
+  ],
+  "result": {
+    "item": "locks:key_ring_large",
+    "count": 1
+  }
+}
