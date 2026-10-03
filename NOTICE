@@ -1,0 +1,33 @@
+Locks — port no oficial a NeoForge 1.21.1
+=========================================
+
+Este proyecto es un port NO OFICIAL del mod Locks.
+
+Obra original
+-------------
+  Nombre:    Locks
+  Autoría:   Melonslise (cuenta actual: MercurialPony) y colaboradores
+             Kaleb Langley, Yuqi154
+  Repositorio: https://github.com/MercurialPony/Locks
+  Descripción: "a small, but unique Minecraft mod that introduces flexible and
+               universal locks, a fun new lock picking mechanic and lots of
+               other useful tools."
+
+Licencia
+--------
+  Creative Commons Attribution-NonCommercial 3.0 Unported (CC-BY-NC-3.0)
+  https://creativecommons.org/licenses/by-nc/3.0/
+  Texto completo en el archivo LICENSE.
+
+  Condiciones principales:
+    - Atribución (BY): hay que dar crédito a la autoría original.
+    - No comercial (NC): no se puede usar esta obra con fines comerciales.
+
+Alcance
+-------
+  Este repositorio deriva del original (port de Fabric a NeoForge 1.21.1). Las
+  partes derivadas del original siguen sujetas a CC-BY-NC-3.0. Las
+  modificaciones y el código nuevo específico de este port pertenecen a quien
+  lo mantiene.
+
+  Este port no está afiliado ni respaldado por la autoría original.

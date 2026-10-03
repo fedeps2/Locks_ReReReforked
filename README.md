@@ -7,7 +7,7 @@ llaveros, minijuego de ganzúa, encantamientos y candados generados en estructur
 - Mod id: `locks` · versión `1.0-beta`
 - Minecraft `1.21.1` · NeoForge `21.1.x`
 - Opcionales: **Curios** (llaveros equipables), **Lootr** (compatibilidad)
-- Licencia: CC-BY-NC-3.0
+- Licencia: [CC-BY-NC-3.0](LICENSE) · atribución y créditos en [NOTICE](NOTICE)
 
 ## Documentación
 
@@ -32,3 +32,16 @@ Toda la documentación técnica está en [`docs/`](docs/README.md):
 
 Requiere JDK 21. Créditos originales en `gradle.properties` (`mod_author`,
 `credits`).
+
+## Licencia y atribución
+
+Port **no oficial** del mod **Locks** de **Melonslise** (cuenta actual:
+[MercurialPony](https://github.com/MercurialPony/Locks)) y colaboradores
+(Kaleb Langley, Yuqi154).
+
+- Licencia: **CC-BY-NC-3.0** (texto completo en [`LICENSE`](LICENSE)).
+- Atribución, alcance y condiciones: [`NOTICE`](NOTICE).
+- Se permite el uso y la redistribución con **atribución** y **sin fines
+  comerciales**.
+
+Este proyecto no está afiliado ni respaldado por la autoría original.
