@@ -58,15 +58,24 @@ public class KeyRingContainer extends AbstractContainerMenu
 
 	public static class StorageSlot extends Slot
 	{
-		public StorageSlot(Inventory inventory, int index, int x, int y)
+		private final ItemStack protectedKeyRing;
+
+		public StorageSlot(Inventory inventory, int index, int x, int y, ItemStack protectedKeyRing)
 		{
 			super(inventory, index, x, y);
+			this.protectedKeyRing = protectedKeyRing;
 		}
 
 		@Override
 		public boolean mayPickup(Player player)
 		{
-			return !(this.getItem().getItem() instanceof KeyRingItem);
+			return this.getItem() != this.protectedKeyRing && super.mayPickup(player);
+		}
+
+		@Override
+		public boolean mayPlace(ItemStack stack)
+		{
+			return this.getItem() != this.protectedKeyRing && super.mayPlace(stack);
 		}
 	}
 
@@ -74,11 +83,13 @@ public class KeyRingContainer extends AbstractContainerMenu
 	public final ItemStack stack;
 	public final IItemHandler inv;
 	public final int rows;
+	public final InteractionHand hand;
 
-	public KeyRingContainer(int id, Player player, ItemStack stack)
+	public KeyRingContainer(int id, Player player, InteractionHand hand, ItemStack stack)
 	{
 		super(LocksContainerTypes.KEY_RING_TYPE.get(), id);
 		this.player = player;
+		this.hand = hand;
 		this.stack = stack;
 
 		int slotCount = 9;
@@ -91,7 +102,7 @@ public class KeyRingContainer extends AbstractContainerMenu
 			rawHandler = ItemHandler.ofSize(slotCount);
 			stack.set(LocksComponents.ITEM_HANDLER.get(), rawHandler);
 		}
-		rawHandler.setOnChanged(handler -> this.stack.set(LocksComponents.ITEM_HANDLER.get(), handler));
+		rawHandler.setOnChanged(handler -> this.stack.set(LocksComponents.ITEM_HANDLER.get(), handler.copy()));
 		this.inv = rawHandler;
 
 		this.rows = inv.getSlots() / 9;
@@ -102,22 +113,24 @@ public class KeyRingContainer extends AbstractContainerMenu
 		int offset = (rows - 4) * 18;
 		for(int row = 0; row < 3; ++row)
 			for (int col = 0; col < 9; ++col)
-				this.addSlot(new StorageSlot(player.getInventory(), col + row * 9 + 9, 8 + col * 18, 103 + row * 18 + offset));
+				this.addSlot(new StorageSlot(player.getInventory(), col + row * 9 + 9, 8 + col * 18, 103 + row * 18 + offset, stack));
 
 		for(int coll = 0; coll < 9; ++coll)
-			this.addSlot(new StorageSlot(player.getInventory(), coll, 8 + coll * 18, 161 + offset));
+			this.addSlot(new StorageSlot(player.getInventory(), coll, 8 + coll * 18, 161 + offset, stack));
 	}
 
 	@Override
 	public boolean stillValid(Player player)
 	{
-		return !this.stack.isEmpty();
+		return !this.stack.isEmpty() && player.getItemInHand(this.hand) == this.stack;
 	}
 
 	@Override
 	public ItemStack quickMoveStack(Player player, int index)
 	{
 		ItemStack result = ItemStack.EMPTY;
+		if (!this.stillValid(player))
+			return result;
 		Slot slot = this.slots.get(index);
 		if(slot == null || !slot.hasItem())
 			return result;
@@ -144,9 +157,11 @@ public class KeyRingContainer extends AbstractContainerMenu
 	public static class Provider implements MenuProvider
 	{
 		public final ItemStack stack;
+		public final InteractionHand hand;
 
-		public Provider(ItemStack stack)
+		public Provider(InteractionHand hand, ItemStack stack)
 		{
+			this.hand = hand;
 			this.stack = stack;
 		}
 
@@ -154,7 +169,7 @@ public class KeyRingContainer extends AbstractContainerMenu
 		@Override
 		public AbstractContainerMenu createMenu(int containerId, Inventory inv, Player player)
 		{
-			return new KeyRingContainer(containerId, player, this.stack);
+			return new KeyRingContainer(containerId, player, this.hand, this.stack);
 		}
 
 		@Override

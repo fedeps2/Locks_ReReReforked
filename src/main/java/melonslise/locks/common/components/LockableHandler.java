@@ -19,13 +19,14 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 import java.util.Observable;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class LockableHandler implements ILockableHandler {
+public class LockableHandler implements ILockableHandler, INBTSerializable<CompoundTag> {
 
     public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(Locks.ID, "lockable_handler");
 
@@ -140,5 +141,17 @@ public class LockableHandler implements ILockableHandler {
         for(Lockable lkb : this.lockables.values())
             list.add(Lockable.toNbt(provider, lkb));
         compoundTag.put("Lockables", list);
+    }
+
+    @Override
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        CompoundTag tag = new CompoundTag();
+        this.writeToNbt(tag, provider);
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
+        this.readFromNbt(nbt, provider);
     }
 }

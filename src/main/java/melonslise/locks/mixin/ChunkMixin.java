@@ -37,5 +37,21 @@ public class ChunkMixin
 				PacketDistributor.sendToPlayer(player, new AddLockableToChunkPacket(lkb, ch));
 			});
 		}
+
+		// Rebuild the in-memory per-chunk index for lockables persisted in the level data
+		// (covers chunks loaded from disk after a restart or unload, where the worldgen list is empty)
+		int cx0 = ch.getPos().getMinBlockX();
+		int cz0 = ch.getPos().getMinBlockZ();
+		for(Lockable lkb : handler.getLoaded().values())
+		{
+			if(st.get().containsKey(lkb.id) || lkb.tr == null)
+				continue;
+			if(!lkb.bb.intersects(cx0, Integer.MIN_VALUE, cz0, cx0 + 16, Integer.MAX_VALUE, cz0 + 16))
+				continue;
+			st.add(lkb);
+			world.getServer().getPlayerList().players.forEach(player -> {
+				PacketDistributor.sendToPlayer(player, new AddLockableToChunkPacket(lkb, ch));
+			});
+		}
 	}
 }

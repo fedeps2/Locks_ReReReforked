@@ -116,6 +116,9 @@ public class Lockable extends Observable implements Observer
 
 	public int oldSwingTicks, swingTicks, maxSwingTicks;
 
+	// Set when a lock is unlocked by a matching key to open a container; the lock re-locks when the last player closes it
+	public boolean autoRelock;
+
 	public Map<List<BlockState>, State> cache = new HashMap<>(6);
 
 

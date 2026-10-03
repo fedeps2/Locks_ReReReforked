@@ -20,14 +20,15 @@ public final class LocksItemModelsProperties
 		ClampedItemPropertyFunction keysGetter = (stack, world, entity, speed) ->
 		{
 			ItemHandler inv = stack.get(LocksComponents.ITEM_HANDLER.get());
-				if(inv!=null){
-					int keys = 0;
-					for(int a = 0; a < inv.getSlots(); ++a)
-						if(!inv.getStackInSlot(a).isEmpty())
-							++keys;
-					return (float) keys / inv.getSlots();
-				}
+			if (inv == null || inv.getSlots() == 0)
 				return 0f;
+
+			int keys = 0;
+			for (int a = 0; a < inv.getSlots(); ++a) {
+				if (!inv.getStackInSlot(a).isEmpty())
+					++keys;
+			}
+			return keys == 0 ? 0f : keys == 1 ? 0.1f : keys == 2 ? 0.21f : 0.32f;
 		};
 		ResourceLocation keysId = ResourceLocation.fromNamespaceAndPath(Locks.ID, "keys");
 		ItemProperties.register(LocksItems.KEY_RING.get(), keysId, keysGetter);

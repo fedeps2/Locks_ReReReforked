@@ -27,7 +27,6 @@ public final class Locks
 		LocksContainerTypes.register(modBus);
 		LocksRecipeSerializers.register(modBus);
 		LocksFeatures.register(modBus);
-		LocksEnchantments.register(modBus);
 		LocksEvents.register(modBus);
 		LocksNetwork.register(modBus);
 

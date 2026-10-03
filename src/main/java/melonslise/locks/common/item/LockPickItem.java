@@ -8,6 +8,7 @@ import melonslise.locks.common.util.LocksPredicates;
 import melonslise.locks.common.util.LocksUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -20,7 +21,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
@@ -54,9 +54,9 @@ public class LockPickItem extends Item
 		return getOrSetStrength(stack) > cmp * 0.25f;
 	}
 
-	public static boolean canPick(ItemStack stack, Lockable lkb)
+	public static boolean canPick(ItemStack stack, Lockable lkb, HolderLookup.Provider registries)
 	{
-		return canPick(stack, EnchantmentHelper.getItemEnchantmentLevel(LocksEnchantments.COMPLEXITY, lkb.stack));
+		return canPick(stack, LocksEnchantments.getEnchantmentLevel(registries, lkb.stack, LocksEnchantments.COMPLEXITY_KEY));
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class LockPickItem extends Item
 		if(match.isEmpty())
 			return InteractionResult.PASS;
 		Lockable lkb = match.get(0);
-		if(!canPick(ctx.getItemInHand(), lkb))
+		if(!canPick(ctx.getItemInHand(), lkb, world.registryAccess()))
 		{
 			if(world.isClientSide)
 				player.displayClientMessage(TOO_COMPLEX_MESSAGE, true);

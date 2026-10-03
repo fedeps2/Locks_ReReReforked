@@ -1,0 +1,10 @@
+{
+	"description": { "translate": "enchantment.locks.complexity" },
+	"supported_items": [ "locks:key_blank", "locks:wood_lock", "locks:iron_lock", "locks:steel_lock", "locks:gold_lock", "locks:diamond_lock" ],
+	"weight": 1,
+	"max_level": 3,
+	"min_cost": { "base": 7, "per_level_above_first": 10 },
+	"max_cost": { "base": 22, "per_level_above_first": 10 },
+	"anvil_cost": 1,
+	"slots": [ "any" ]
+}

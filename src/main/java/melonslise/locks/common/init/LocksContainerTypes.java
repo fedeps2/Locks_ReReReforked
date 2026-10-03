@@ -27,7 +27,7 @@ public final class LocksContainerTypes
 	public static final Supplier<MenuType<KeyRingContainer>> KEY_RING_TYPE = MENUS.register("key_ring",
 			() -> IMenuTypeExtension.create((id, inv, data) -> {
 				InteractionHand hand = data.readEnum(InteractionHand.class);
-				return new KeyRingContainer(id, inv.player, inv.player.getItemInHand(hand));
+				return new KeyRingContainer(id, inv.player, hand, inv.player.getItemInHand(hand));
 			}));
 
 	private LocksContainerTypes() {}

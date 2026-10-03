@@ -9,6 +9,7 @@ import melonslise.locks.common.util.Lockable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -23,7 +24,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
@@ -68,9 +68,10 @@ public class LockPickingContainer extends AbstractContainerMenu
 		Lockable.State state = lkb.getLockState(player.level());
 		this.pos = state == null ? lkb.bb.center() : state.pos;
 
-		this.shocking = EnchantmentHelper.getItemEnchantmentLevel(LocksEnchantments.SHOCKING, this.lockable.stack);
-		this.sturdy = EnchantmentHelper.getItemEnchantmentLevel(LocksEnchantments.STURDY, this.lockable.stack);
-		this.complexity = EnchantmentHelper.getItemEnchantmentLevel(LocksEnchantments.COMPLEXITY, this.lockable.stack);
+		HolderLookup.Provider registries = player.level().registryAccess();
+		this.shocking = LocksEnchantments.getEnchantmentLevel(registries, this.lockable.stack, LocksEnchantments.SHOCKING_KEY);
+		this.sturdy = LocksEnchantments.getEnchantmentLevel(registries, this.lockable.stack, LocksEnchantments.STURDY_KEY);
+		this.complexity = LocksEnchantments.getEnchantmentLevel(registries, this.lockable.stack, LocksEnchantments.COMPLEXITY_KEY);
 
 		for (int rows = 0; rows < 3; ++rows)
 			for (int cols = 0; cols < 9; ++cols)

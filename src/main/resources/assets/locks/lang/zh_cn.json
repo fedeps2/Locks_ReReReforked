@@ -34,6 +34,8 @@
 
   "locks.gui.lockpicking.title": "撬锁中",
   "locks.gui.lockpicking.open": "点击`ESC`打开",
+  "locks.gui.rename_key": "重命名钥匙",
+  "locks.gui.rename_key_button": "重命名",
 
   "locks.subtitle.key_ring": "钥匙：叮当响",
   "locks.subtitle.lock.close": "锁：咔哒",

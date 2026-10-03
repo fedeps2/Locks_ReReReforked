@@ -36,6 +36,7 @@
 	"locks.gui.lockpicking.title": "Lock picking",
 	"locks.gui.lockpicking.open": "Press `ESC` to open",
 	"locks.gui.rename_key": "Rename Key",
+	"locks.gui.rename_key_button": "Rename",
 
 	"locks.subtitle.key_ring": "Keys jingle",
 	"locks.subtitle.lock.close": "Lock clicks",

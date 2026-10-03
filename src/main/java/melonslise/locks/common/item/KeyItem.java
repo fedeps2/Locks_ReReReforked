@@ -37,7 +37,9 @@ public class KeyItem extends LockingItem
 	{
 		Level world = ctx.getLevel();
 		BlockPos pos = ctx.getClickedPos();
-		int id = getOrSetId(ctx.getItemInHand());
+		Integer id = getId(ctx.getItemInHand());
+		if (id == null)
+			return InteractionResult.PASS;
 		List<Lockable> match = LocksUtil.intersecting(world, pos).filter(lkb -> lkb.lock.lockRecord.id() == id).collect(Collectors.toList());
 		if(match.isEmpty())
 			return InteractionResult.PASS;

@@ -65,7 +65,7 @@ public class StructureTemplateMixin {
             BlockPos pos1 = LocksUtil.transform(lkb.bb.x1(), lkb.bb.y1(), lkb.bb.z1(), settings);
             BlockPos pos2 = LocksUtil.transform(lkb.bb.x2(), lkb.bb.y2(), lkb.bb.z2(), settings);
             Cuboid6i bb = new Cuboid6i(pos1.getX() + start.getX(), pos1.getY() + start.getY(), pos1.getZ() + start.getZ(), pos2.getX() + start.getX(), pos2.getY() + start.getY(), pos2.getZ() + start.getZ());
-            ItemStack stack = LocksConfig.RANDOMIZE_LOADED_LOCKS.get() ? LocksConfig.getRandomLock(rng) : lkb.stack;
+            ItemStack stack = LocksConfig.RANDOMIZE_LOADED_LOCKS.get() ? LocksConfig.getRandomLock(rng, level.registryAccess()) : lkb.stack;
             Lock lock = LocksConfig.RANDOMIZE_LOADED_LOCKS.get() ? Lock.from(stack) : lkb.lock;
             Transform tr = Transform.fromDirectionAndFace(settings.getRotation().rotate(settings.getMirror().getRotation(lkb.tr.dir).rotate(lkb.tr.dir)), lkb.tr.face, Direction.NORTH);
             handler.add(new Lockable(bb, lock, tr, stack, level),level);

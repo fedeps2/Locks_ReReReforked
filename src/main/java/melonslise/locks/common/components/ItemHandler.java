@@ -64,6 +64,13 @@ public class ItemHandler implements IItemHandler {
         return new ItemHandler(NonNullList.withSize(size, ItemStack.EMPTY));
     }
 
+    public ItemHandler copy() {
+        List<ItemStack> copiedItems = new ArrayList<>(this.items.size());
+        for (ItemStack item : this.items)
+            copiedItems.add(item.copy());
+        return new ItemHandler(copiedItems);
+    }
+
     public void setOnChanged(Consumer<ItemHandler> onChanged) {
         this.onChanged = onChanged;
     }
@@ -105,10 +112,17 @@ public class ItemHandler implements IItemHandler {
 
     @Override
     public ItemStack removeItem(int i, int j) {
-        ItemStack itemStack = this.items.get(i);
-        itemStack.setCount(itemStack.getCount() - j);
+        ItemStack stack = this.items.get(i);
+        if (stack.isEmpty() || j <= 0)
+            return ItemStack.EMPTY;
+        if (stack.getCount() <= j) {
+            this.items.set(i, ItemStack.EMPTY);
+            markChanged();
+            return stack;
+        }
+        ItemStack split = stack.split(j);
         markChanged();
-        return itemStack;
+        return split;
     }
 
     @Override

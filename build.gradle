@@ -28,7 +28,11 @@ repositories {
 }
 
 base {
-    archivesName = mod_id
+    archivesName = "Locks_Neoforge_1.21.1_Beta_1.0"
+}
+
+jar {
+    archiveVersion = ''
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)

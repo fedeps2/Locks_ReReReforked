@@ -9,6 +9,8 @@ import melonslise.locks.common.config.LocksServerConfig;
 import melonslise.locks.common.init.LocksComponents;
 import melonslise.locks.common.init.LocksItemTags;
 import melonslise.locks.common.item.KeyItem;
+import melonslise.locks.common.item.LockingItem;
+import melonslise.locks.common.network.toserver.RenameKeyPacket;
 import melonslise.locks.common.util.Lockable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -124,7 +126,13 @@ public class LocksClient {
         if (!(stack.getItem() instanceof KeyItem))
             return;
 
-        Minecraft.getInstance().setScreen(new RenameKeyScreen(stack));
+        Integer keyId = LockingItem.getId(stack);
+        var clientPlayer = Minecraft.getInstance().player;
+        if (clientPlayer != null && clientPlayer.containerMenu != clientPlayer.inventoryMenu)
+            clientPlayer.closeContainer();
+        Minecraft.getInstance().setScreen(new RenameKeyScreen(hoveredSlot.index,
+            keyId == null ? RenameKeyPacket.NO_KEY_ID : keyId, stack));
+        event.setCanceled(true);
     }
 
 

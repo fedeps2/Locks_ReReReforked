@@ -1,8 +1,8 @@
 package melonslise.locks.client.gui;
 
 import melonslise.locks.common.network.toserver.RenameKeyPacket;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -19,11 +19,17 @@ public class RenameKeyScreen extends Screen {
 	private static final int WIDTH = 200;
 	private static final int HEIGHT = 60;
 
+	private final int slotIndex;
+	private final int keyId;
 	private final ItemStack keyStack;
 	private EditBox nameField;
+	private Button saveButton;
+	private boolean submitted;
 
-	public RenameKeyScreen(ItemStack keyStack) {
+	public RenameKeyScreen(int slotIndex, int keyId, ItemStack keyStack) {
 		super(TITLE);
+		this.slotIndex = slotIndex;
+		this.keyId = keyId;
 		this.keyStack = keyStack;
 	}
 
@@ -35,7 +41,6 @@ public class RenameKeyScreen extends Screen {
 
 		this.nameField = new EditBox(this.font, centerX - WIDTH / 2 + 5, centerY - 10, WIDTH - 10, 20, Component.empty());
 		this.nameField.setMaxLength(50);
-		this.nameField.setFocused(true);
 
 		String currentName = null;
 		var customName = keyStack.get(net.minecraft.core.component.DataComponents.CUSTOM_NAME);
@@ -45,6 +50,11 @@ public class RenameKeyScreen extends Screen {
 			this.nameField.setValue(currentName);
 
 		this.addRenderableWidget(this.nameField);
+		this.saveButton = this.addRenderableWidget(Button.builder(
+				Component.translatable("locks.gui.rename_key_button"), button -> this.sendName())
+			.bounds(centerX - 45, centerY + 16, 90, 20)
+			.build());
+		this.setFocused(this.nameField);
 	}
 
 	@Override
@@ -61,8 +71,12 @@ public class RenameKeyScreen extends Screen {
 	}
 
 	private void sendName() {
+		if (this.submitted)
+			return;
+		this.submitted = true;
+		this.saveButton.active = false;
 		String name = this.nameField.getValue().trim();
-		PacketDistributor.sendToServer(new RenameKeyPacket(name));
+		PacketDistributor.sendToServer(new RenameKeyPacket(this.slotIndex, this.keyId, name));
 		this.onClose();
 	}
 
@@ -73,11 +87,13 @@ public class RenameKeyScreen extends Screen {
 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-		super.render(guiGraphics, mouseX, mouseY, partialTick);
 		int centerX = this.width / 2;
 		int centerY = this.height / 2;
 
-		guiGraphics.fill(centerX - WIDTH / 2, centerY - 20, centerX + WIDTH / 2, centerY + 30, 0x88000000);
+		this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+		guiGraphics.fill(centerX - WIDTH / 2, centerY - 42, centerX + WIDTH / 2, centerY + 45, 0x88000000);
 		guiGraphics.drawString(this.font, TITLE, centerX - WIDTH / 2 + 5, centerY - 30, 0xFFFFFF);
+		this.nameField.render(guiGraphics, mouseX, mouseY, partialTick);
+		this.saveButton.render(guiGraphics, mouseX, mouseY, partialTick);
 	}
 }

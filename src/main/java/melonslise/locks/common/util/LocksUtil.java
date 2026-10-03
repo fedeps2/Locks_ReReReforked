@@ -193,7 +193,7 @@ public final class LocksUtil {
             }
         }
         Cuboid6i bb = new Cuboid6i(blockPos, pos1);
-        ItemStack stack = LocksConfig.getRandomLock(randomSource);
+        ItemStack stack = LocksConfig.getRandomLock(randomSource, level.registryAccess());
         Lock lock = Lock.gen(stack);
         Transform tr = Transform.fromDirection(dir, dir);
         return new Lockable(bb, lock, tr, stack, level);

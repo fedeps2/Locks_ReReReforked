@@ -22,6 +22,7 @@ import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.api.SlotContext;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class KeyRingItem extends Item implements ICurioItem
@@ -48,7 +49,7 @@ public class KeyRingItem extends Item implements ICurioItem
 		ItemHandler inv = stack.get(LocksComponents.ITEM_HANDLER.get());
 		if (inv == null) return false;
 		for(int a = 0; a < inv.getSlots(); ++a)
-			if(LockingItem.getOrSetId(inv.getStackInSlot(a)) == id)
+			if(!inv.getStackInSlot(a).isEmpty() && Objects.equals(LockingItem.getId(inv.getStackInSlot(a)), id))
 				return true;
 		return false;
 	}
@@ -69,7 +70,7 @@ public class KeyRingItem extends Item implements ICurioItem
 		KeyRingItem self = (KeyRingItem) stack.getItem();
 		self.getOrCreateHandler(stack);
 		if(player instanceof ServerPlayer serverPlayer){
-			serverPlayer.openMenu(new KeyRingContainer.Provider(stack),
+			serverPlayer.openMenu(new KeyRingContainer.Provider(hand, stack),
 				KeyRingContainer.getExtraData(hand));
 		}
 		return new InteractionResultHolder<>(InteractionResult.PASS, stack);
@@ -88,7 +89,12 @@ public class KeyRingItem extends Item implements ICurioItem
 			return InteractionResult.PASS;
 		for(int a = 0; a < inv.getSlots(); ++a)
 		{
-			int id = LockingItem.getOrSetId(inv.getStackInSlot(a));
+			ItemStack key = inv.getStackInSlot(a);
+			if (key.isEmpty())
+				continue;
+			Integer id = LockingItem.getId(key);
+			if (id == null)
+				continue;
 			List<Lockable> match = intersect.stream().filter(lkb -> lkb.lock.lockRecord.id() == id).collect(Collectors.toList());
 			if(match.isEmpty())
 				continue;

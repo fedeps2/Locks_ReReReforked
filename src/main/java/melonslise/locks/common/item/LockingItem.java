@@ -36,8 +36,8 @@ public class LockingItem extends Item
 		return to;
 	}
 
-	public static int getOrSetId(ItemStack stack)
-	{
+    public static int getOrSetId(ItemStack stack)
+    {
 		@Nullable var data = stack.get(DataComponents.CUSTOM_DATA);
 
 		if (data == null || !data.contains(KEY_ID)){
@@ -49,8 +49,17 @@ public class LockingItem extends Item
 			return randId;
 		}
 
-		return data.copyTag().getInt(KEY_ID);
-	}
+        return data.copyTag().getInt(KEY_ID);
+    }
+
+    @Nullable
+    public static Integer getId(ItemStack stack)
+    {
+        var data = stack.get(DataComponents.CUSTOM_DATA);
+        if (data == null || !data.contains(KEY_ID))
+            return null;
+        return data.copyTag().getInt(KEY_ID);
+    }
 
 	@Override
 	public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected)
@@ -65,6 +74,10 @@ public class LockingItem extends Item
 	{
 		CompoundTag compoundTag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
 		if(compoundTag.contains(KEY_ID))
-			lines.add(Component.translatable(Locks.ID + ".tooltip.id", getOrSetId(stack)).withStyle(ChatFormatting.DARK_GREEN));
+		{
+			Integer id = getId(stack);
+			if (id != null)
+				lines.add(Component.translatable(Locks.ID + ".tooltip.id", id).withStyle(ChatFormatting.DARK_GREEN));
+		}
 	}
 }

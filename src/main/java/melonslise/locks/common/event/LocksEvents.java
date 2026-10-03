@@ -6,11 +6,13 @@ import melonslise.locks.common.config.LocksClientConfig;
 import melonslise.locks.common.config.LocksServerConfig;
 import melonslise.locks.common.container.LockPickingContainer;
 import melonslise.locks.common.init.LocksComponents;
+import melonslise.locks.common.init.LocksEnchantments;
 import melonslise.locks.common.init.LocksItemTags;
 import melonslise.locks.common.init.LocksItems;
 import melonslise.locks.common.init.LocksSoundEvents;
 import melonslise.locks.common.init.LocksVillagerTrades;
 import melonslise.locks.common.item.KeyRingItem;
+import melonslise.locks.common.item.LockPickItem;
 import melonslise.locks.common.item.LockingItem;
 import melonslise.locks.common.util.Lockable;
 import melonslise.locks.common.util.LocksPredicates;
@@ -27,6 +29,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.bus.api.IEventBus;
@@ -70,6 +73,19 @@ public final class LocksEvents
 		return false;
 	}
 
+	private static boolean keyMatches(ItemStack stack, Lockable lkb)
+	{
+		Item item = stack.getItem();
+		if (item == LocksItems.MASTER_KEY.get())
+			return true;
+		if (stack.is(LocksItemTags.KEYS))
+		{
+			Integer id = LockingItem.getId(stack);
+			return id != null && id == lkb.lock.lockRecord.id();
+		}
+		return item instanceof KeyRingItem && KeyRingItem.containsId(stack, lkb.lock.lockRecord.id());
+	}
+
 	private static InteractionResult handleRightClick(Player player, Level world, InteractionHand hand, BlockHitResult result)
 	{
 		BlockPos pos = result.getBlockPos();
@@ -82,13 +98,34 @@ public final class LocksEvents
 			return InteractionResult.FAIL;
 		}
 		ItemStack stack = player.getItemInHand(hand);
+
+		// Shift + click with a matching key toggles the lock without opening the block, and keeps it that way
+		// (autoRelock is cleared so a chest can be left unlocked for others to open)
+		if (player.isShiftKeyDown())
+		{
+			Lockable[] matches = Arrays.stream(intersect).filter(lkb -> keyMatches(stack, lkb)).toArray(Lockable[]::new);
+			if (matches.length > 0)
+			{
+				player.swing(InteractionHand.MAIN_HAND);
+				boolean wasLocked = matches[0].lock.isLocked();
+				for (Lockable lkb : matches)
+				{
+					if (!world.isClientSide)
+						lkb.autoRelock = false;
+					lkb.lock.setLocked(!lkb.lock.isLocked());
+				}
+				world.playSound(player, pos, wasLocked ? LocksSoundEvents.LOCK_OPEN.get() : LocksSoundEvents.LOCK_CLOSE.get(), SoundSource.BLOCKS, 1f, 1f);
+				return InteractionResult.CONSUME;
+			}
+		}
 		Optional<Lockable> locked = Arrays.stream(intersect).filter(LocksPredicates.LOCKED).findFirst();
 		if(locked.isPresent())
 		{
 			Lockable lkb = locked.get();
 			Item item = stack.getItem();
 			boolean isLockPick = stack.is(LocksItemTags.LOCK_PICKS);
-			boolean isMatchingKeyInHand = item == LocksItems.MASTER_KEY.get() || (stack.is(LocksItemTags.KEYS) && LockingItem.getOrSetId(stack) == lkb.lock.lockRecord.id()) || (item instanceof KeyRingItem && KeyRingItem.containsId(stack, lkb.lock.lockRecord.id()));
+			Integer handKeyId = stack.is(LocksItemTags.KEYS) ? LockingItem.getId(stack) : null;
+			boolean isMatchingKeyInHand = item == LocksItems.MASTER_KEY.get() || (handKeyId != null && handKeyId == lkb.lock.lockRecord.id()) || (item instanceof KeyRingItem && KeyRingItem.containsId(stack, lkb.lock.lockRecord.id()));
 			boolean isMatchingKeyInCurios = !isMatchingKeyInHand && checkCuriosKeyrings(player, lkb.lock.lockRecord.id());
 			boolean isMatchingKey = isMatchingKeyInHand || isMatchingKeyInCurios;
 
@@ -113,7 +150,27 @@ public final class LocksEvents
 
 			if (isMatchingKeyInHand) {
 				player.swing(InteractionHand.MAIN_HAND);
+				if (world.getBlockEntity(pos) instanceof BaseContainerBlockEntity) {
+					world.playSound(player, pos, LocksSoundEvents.LOCK_OPEN.get(), SoundSource.BLOCKS, 1f, 1f);
+					for (Lockable lkb2 : intersect) {
+						if (lkb2.lock.lockRecord.id() == lkb.lock.lockRecord.id() && lkb2.lock.isLocked()) {
+							lkb2.lock.setLocked(false);
+							if (!world.isClientSide) {
+								lkb2.autoRelock = true;
+							}
+						}
+					}
+				}
 				return InteractionResult.PASS;
+			}
+
+			// The complexity enchantment gates which lock picks can even start the minigame
+			if (isLockPick && !LockPickItem.canPick(stack,
+					LocksEnchantments.getEnchantmentLevel(world.registryAccess(), lkb.stack, LocksEnchantments.COMPLEXITY_KEY)))
+			{
+				if (world.isClientSide)
+					player.displayClientMessage(LockPickItem.TOO_COMPLEX_MESSAGE, true);
+				return InteractionResult.FAIL;
 			}
 
 			if (world.isClientSide) {

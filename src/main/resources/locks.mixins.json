@@ -8,6 +8,7 @@
     "ChunkManagerMixin",
     "ChunkMixin",
     "ChunkPrimerMixin",
+    "ContainerOpenersCounterMixin",
     "DoorMixin",
     "ExplosionContextMixin",
     "HopperTileEntityMixin",
